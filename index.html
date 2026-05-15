@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deutsche Übersetzung — Von Milan Magar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+  <link rel="stylesheet" type="text/css" href="css/headerfooter.css">
+  <link rel="stylesheet" type="text/css" href="css/home.css">
+
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="header-brand">
+    <div>
+      <h1 class="brand-title">Deutsche <span>Übersetzung</span></h1>
+      <h2 class="brand-subtitle">Von Milan Magar</h2>
+    </div>
+    <div class="brand-rule"></div>
+  </div>
+
+  <nav class="header-nav" aria-label="Hauptnavigation">
+    <a href="index.html" class="active">Homepage</a>
+    <a href="translation.html">Translation</a>
+    <a href="contact.html">Contact</a>
+    <a href="wordcollection.html">Word Collection</a>
+  </nav>
+
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menü öffnen">☰ Menü</button>
+  <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile Navigation">
+    <a href="index.html" class="active">Homepage</a>
+    <a href="translation.html">Translation</a>
+    <a href="contact.html">Contact</a>
+    <a href="wordcollection.html">Word Collection</a>
+  </nav>
+</header>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main>
+
+  <!-- Hero: Elevator Speech -->
+  <section class="hero">
+    <span class="hero-label">Welcome to Deutsche Übersetzung</span>
+    <h2 class="hero-heading">
+      Bridging <em>English &amp; Deutsch</em> — one word at a time.
+    </h2>
+    <p class="hero-sub">
+      We provide thoughtful German translations and curated language resources
+      to help learners and professionals communicate clearly, confidently, and culturally.
+    </p>
+    <div class="hero-divider"></div>
+  </section>
+
+  <!-- About Strip -->
+  <div class="about-strip">
+    <blockquote>
+      "A platform built by <span>Milan Magar</span> — translator, language enthusiast,
+      and bridge between two worlds — to help you learn, translate, and connect."
+    </blockquote>
+    <cite>— Portfolio &amp; Learning Resource</cite>
+  </div>
+
+  <!-- Navigation Cards -->
+  <section class="explore">
+    <div class="explore-header">
+      <span class="section-label">Explore the site</span>
+      <h2>Where would you like to go?</h2>
+      <p>Choose a section to get started</p>
+    </div>
+
+    <div class="cards">
+
+      <a href="translation.html" class="card">
+        <div class="card-icon">🌐</div>
+        <span class="card-tag">Service</span>
+        <div class="card-title">Translation</div>
+        <p class="card-desc">Browse German translations across various topics — carefully crafted for clarity and accuracy.</p>
+      </a>
+
+      <a href="wordcollection.html" class="card">
+        <div class="card-icon">📖</div>
+        <span class="card-tag">Learning</span>
+        <div class="card-title">Word Collection</div>
+        <p class="card-desc">Explore a growing collection of German words, phrases, and their meanings — great for learners of all levels.</p>
+      </a>
+
+      <a href="contact.html" class="card">
+        <div class="card-icon">✉️</div>
+        <span class="card-tag">Connect</span>
+        <div class="card-title">Contact</div>
+        <p class="card-desc">Have a translation request or a question? Reach out directly — Milan is happy to help.</p>
+      </a>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <p class="footer-thanks">Danke für Ihren Besuch &nbsp;·&nbsp; धन्यवाद</p>
+
+  <div class="footer-flags">
+    <div class="flag-wrap">
+      <span class="fi fi-np"></span>
+      <span class="flag-label">Nepal</span>
+    </div>
+    <div class="flag-wrap">
+      <span class="fi fi-de"></span>
+      <span class="flag-label">Deutschland</span>
+    </div>
+  </div>
+
+  <div class="footer-divider"></div>
+
+  <p class="footer-copy">
+    &copy; <span id="year"></span> Deutsche Übersetzung — Von Milan Magar. Alle Rechte vorbehalten.<br>
+    Designed with ♥ between Nepal &amp; Germany.<br>
+    <a href="contact.html">Kontakt</a> &nbsp;·&nbsp; <a href="#">Datenschutz</a> &nbsp;·&nbsp; <a href="#">Impressum</a>
+  </p>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+</script>
+</body>
+</html>

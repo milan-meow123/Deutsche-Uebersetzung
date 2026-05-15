@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deutsche Übersetzung — Von Milan Magar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+  <link rel="stylesheet" type="text/css" href="css/headerfooter.css">
+  <link rel="stylesheet" type="text/css" href="css/translation.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-brand">
+    <div>
+      <h1 class="brand-title">Deutsche <span>Ubersetzung</span></h1>
+      <h2 class="brand-subtitle">Von Milan Magar</h2>
+    </div>
+    <div class="brand-rule"></div>
+  </div>
+  <nav class="header-nav" aria-label="Hauptnavigation">
+    <a href="index.html">Homepage</a>
+    <a href="translation.html" class="active">Translation</a>
+    <a href="contact.html">Contact</a>
+    <a href="wordcollection.html">Word Collection</a>
+  </nav>
+  <button class="hamburger" onclick="toggleMenu()">Menu</button>
+  <nav class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Homepage</a>
+    <a href="translation.html" class="active">Translation</a>
+    <a href="contact.html">Contact</a>
+    <a href="wordcollection.html">Word Collection</a>
+  </nav>
+</header>
+
+<!-- MAIN -->
+<main class="translation-main">
+  <div class="translation-wrapper">
+    <div class="translation-columns">
+
+      <!-- Box 1: Dein Durchgang (60%) -->
+      <div class="translation-box box-input">
+        <div class="box-header">
+          <span class="box-title">Dein Durchgang</span>
+          <div class="header-right">
+            <span class="word-count-label">Words:</span>
+            <span class="word-count-number" id="wordCount">0</span>
+            <button class="btn-clear" id="clearBtn">x Clear</button>
+          </div>
+        </div>
+        <textarea
+          id="inputText"
+          class="text-area"
+          placeholder="Paste your German text here..."
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <!-- Box 2: Hervorgehobene Worter (40%) -->
+      <div class="translation-box box-output">
+        <div class="box-header">
+          <span class="box-title">Hervorgehobene Worter</span>
+          <button class="btn-clear" id="clearWordsBtn">x Clear</button>
+        </div>
+        <div class="highlighted-list" id="highlightedList">
+          <p class="empty-hint">Highlight a German word on the left to see its meaning.</p>
+        </div>
+        <div class="save-bar">
+          <button class="btn-download" id="downloadUndefinedBtn" style="display:none;">Download undefined.txt</button>
+          <button class="btn-save" id="saveBtn">Save</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-word" id="modalWord"></h2>
+        <span class="modal-category" id="modalCategory"></span>
+      </div>
+      <button class="modal-close" id="modalClose">x</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div class="modal-loading">Looking up word...</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p class="footer-thanks">Danke fur Ihren Besuch &nbsp;.&nbsp; Thank you</p>
+  <div class="footer-flags">
+    <div class="flag-wrap">
+      <span class="fi fi-np"></span>
+      <span class="flag-label">Nepal</span>
+    </div>
+    <div class="flag-wrap">
+      <span class="fi fi-de"></span>
+      <span class="flag-label">Deutschland</span>
+    </div>
+  </div>
+  <div class="footer-divider"></div>
+  <p class="footer-copy">
+    &copy; <span id="year"></span> Deutsche Ubersetzung -- Von Milan Magar. Alle Rechte vorbehalten.<br>
+    Designed with love between Nepal &amp; Germany.<br>
+    <a href="contact.html">Kontakt</a> &nbsp;.&nbsp; <a href="#">Datenschutz</a> &nbsp;.&nbsp; <a href="#">Impressum</a>
+  </p>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // ── Elements ──
+  const inputText        = document.getElementById('inputText');
+  const wordCountEl      = document.getElementById('wordCount');
+  const clearBtn         = document.getElementById('clearBtn');
+  const clearWordsBtn    = document.getElementById('clearWordsBtn');
+  const highlightedList  = document.getElementById('highlightedList');
+  const modalOverlay     = document.getElementById('modalOverlay');
+  const modalWord        = document.getElementById('modalWord');
+  const modalCategory    = document.getElementById('modalCategory');
+  const modalBody        = document.getElementById('modalBody');
+  const modalClose       = document.getElementById('modalClose');
+  const downloadBtn      = document.getElementById('downloadUndefinedBtn');
+
+  // ── identified.txt storage ──
+  let identifiedWords = {};
+
+  async function loadIdentified() {
+    try {
+      const res = await fetch('identified.txt');
+      if (!res.ok) return;
+      const text = await res.text();
+      text.split('\n').forEach(line => {
+        line = line.trim();
+        if (!line) return;
+        const idx = line.indexOf(':');
+        if (idx === -1) return;
+        const german  = line.slice(0, idx).trim().toLowerCase();
+        const english = line.slice(idx + 1).trim();
+        if (german && english) identifiedWords[german] = english;
+      });
+      console.log('identified.txt loaded:', Object.keys(identifiedWords).length, 'words');
+    } catch (e) {
+      console.log('identified.txt not found -- that is fine');
+    }
+  }
+
+  loadIdentified();
+
+  // ── Undefined words ──
+  const undefinedWords = new Set();
+
+  function addToUndefined(word) {
+    undefinedWords.add(word.toLowerCase());
+    downloadBtn.style.display = 'inline-block';
+    downloadBtn.textContent = 'Download undefined.txt (' + undefinedWords.size + ')';
+  }
+
+  downloadBtn.addEventListener('click', () => {
+    const content = Array.from(undefinedWords).sort().join('\n');
+    const blob = new Blob([content], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'undefined.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // ── Word count ──
+  inputText.addEventListener('input', () => {
+    const val = inputText.value.trim();
+    wordCountEl.textContent = val === '' ? 0 : val.split(/\s+/).length;
+  });
+
+  // ── Clear text ──
+  clearBtn.addEventListener('click', () => {
+    inputText.value = '';
+    wordCountEl.textContent = 0;
+  });
+
+  // ── Clear word list ──
+  clearWordsBtn.addEventListener('click', () => {
+    highlightedList.innerHTML = '<p class="empty-hint">Highlight a German word on the left to see its meaning.</p>';
+  });
+
+  // ── Fetch from API ──
+  async function fetchWordData(word) {
+    const url = 'https://freedictionaryapi.com/api/v1/entries/de/' + encodeURIComponent(word);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Not found');
+    return await res.json();
+  }
+
+  // ── Inflection prefixes ──
+  const inflectionPrefixes = [
+    'inflection of', 'genitive of', 'dative of', 'accusative of',
+    'nominative of', 'plural of', 'singular of', 'past tense of',
+    'past participle of', 'present participle of', 'comparative of',
+    'superlative of', 'alternative form of', 'diminutive of', 'feminine of'
+  ];
+
+  function extractBaseWord(definition) {
+    const lower = definition.toLowerCase();
+    for (const prefix of inflectionPrefixes) {
+      if (lower.startsWith(prefix)) {
+        let base = definition.slice(prefix.length).trim().replace(/[:.;,].*$/, '').trim();
+        return base;
+      }
+    }
+    return null;
+  }
+
+  // ── Smart fetch with lemmatization ──
+  async function fetchWordDataSmart(word) {
+    const data = await fetchWordData(word);
+    const entry = data.entries[0];
+    const firstDef = entry.senses && entry.senses[0] ? entry.senses[0].definition : '';
+    const baseWord = extractBaseWord(firstDef);
+    if (baseWord) {
+      try {
+        const baseData = await fetchWordData(baseWord);
+        baseData._originalWord = word;
+        baseData._baseWord = baseWord;
+        return baseData;
+      } catch (e) {
+        return data;
+      }
+    }
+    return data;
+  }
+
+  // ── Check identified.txt then API ──
+  async function lookupWord(word) {
+    // 1. Check identified.txt first
+    const key = word.toLowerCase();
+    if (identifiedWords[key]) {
+      return {
+        source: 'identified',
+        word: word,
+        meaning: identifiedWords[key]
+      };
+    }
+    // 2. Try API
+    try {
+      const data = await fetchWordDataSmart(word);
+      return { source: 'api', data: data };
+    } catch (e) {
+      // 3. Not found anywhere
+      addToUndefined(word);
+      return { source: 'notfound' };
+    }
+  }
+
+  // ── Highlight listener ──
+  inputText.addEventListener('mouseup', async () => {
+    const start    = inputText.selectionStart;
+    const end      = inputText.selectionEnd;
+    const selected = inputText.value.substring(start, end).trim();
+
+    if (selected === '' || selected.includes(' ')) return;
+
+    const hint = highlightedList.querySelector('.empty-hint');
+    if (hint) hint.remove();
+
+    // Avoid duplicates
+    const existing = Array.from(highlightedList.querySelectorAll('.word-item'))
+      .map(el => el.querySelector('.word-text').textContent.toLowerCase());
+    if (existing.includes(selected.toLowerCase())) return;
+
+    // Build item
+    const item = document.createElement('div');
+    item.classList.add('word-item');
+
+    const num = document.createElement('span');
+    num.classList.add('word-num');
+    num.textContent = (highlightedList.querySelectorAll('.word-item').length + 1) + '.';
+
+    const info = document.createElement('div');
+    info.classList.add('word-info');
+
+    const wordSpan = document.createElement('span');
+    wordSpan.classList.add('word-text');
+    wordSpan.textContent = selected;
+
+    const categorySpan = document.createElement('span');
+    categorySpan.classList.add('word-category');
+    categorySpan.textContent = 'looking up...';
+
+    const defSpan = document.createElement('span');
+    defSpan.classList.add('word-def');
+
+    const removeBtn = document.createElement('button');
+    removeBtn.classList.add('word-remove');
+    removeBtn.textContent = 'x';
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      item.remove();
+      highlightedList.querySelectorAll('.word-item .word-num').forEach((n, i) => {
+        n.textContent = (i + 1) + '.';
+      });
+      if (highlightedList.querySelectorAll('.word-item').length === 0) {
+        highlightedList.innerHTML = '<p class="empty-hint">Highlight a German word on the left to see its meaning.</p>';
+      }
+    });
+
+    info.appendChild(wordSpan);
+    info.appendChild(categorySpan);
+    info.appendChild(defSpan);
+    item.appendChild(num);
+    item.appendChild(info);
+    item.appendChild(removeBtn);
+    highlightedList.appendChild(item);
+
+    item.addEventListener('click', () => openModal(selected));
+
+    // Lookup
+    const result = await lookupWord(selected);
+
+    if (result.source === 'identified') {
+      categorySpan.textContent = 'identified';
+      defSpan.textContent = result.meaning;
+      item.classList.add('word-item--identified');
+    } else if (result.source === 'api') {
+      const entry = result.data.entries[0];
+      const pos   = entry.partOfSpeech || '--';
+      const sense = entry.senses[0];
+      const def   = sense ? sense.definition : '--';
+      categorySpan.textContent = pos;
+      defSpan.textContent = def;
+      if (result.data._baseWord) {
+        const baseHint = document.createElement('span');
+        baseHint.classList.add('word-base-hint');
+        baseHint.textContent = '-> base: ' + result.data._baseWord;
+        info.appendChild(baseHint);
+      }
+    } else {
+      categorySpan.textContent = 'not found';
+      defSpan.textContent = 'Added to undefined.txt';
+      item.classList.add('word-item--undefined');
+    }
+  });
+
+  // ── Open Modal ──
+  async function openModal(word) {
+    modalWord.textContent = word;
+    modalCategory.textContent = '';
+    modalBody.innerHTML = '<div class="modal-loading">Looking up word...</div>';
+    modalOverlay.classList.add('open');
+
+    // Check identified.txt first
+    const key = word.toLowerCase();
+    if (identifiedWords[key]) {
+      modalCategory.textContent = 'identified';
+      modalBody.innerHTML =
+        '<div class="modal-section">' +
+        '<h3 class="modal-section-title">Meaning</h3>' +
+        '<p class="sense-def">' + identifiedWords[key] + '</p>' +
+        '</div>';
+      return;
+    }
+
+    try {
+      const data  = await fetchWordDataSmart(word);
+      const entry = data.entries[0];
+      const pos   = entry.partOfSpeech || '--';
+      modalCategory.textContent = pos;
+
+      let html = '';
+
+      if (data._baseWord) {
+        html += '<div class="modal-base-banner">Form of: <button class="base-word-link" data-word="' + data._baseWord + '">' + data._baseWord + '</button> <span class="base-word-hint">-- click to see full definition</span></div>';
+      }
+
+      function linkifyDef(def) {
+        const base = extractBaseWord(def);
+        if (base) {
+          return def.replace(base, '<button class="inline-word-link" data-word="' + base + '">' + base + '</button>');
+        }
+        return def;
+      }
+
+      if (entry.senses && entry.senses.length > 0) {
+        html += '<div class="modal-section"><h3 class="modal-section-title">Definitions</h3>';
+        entry.senses.forEach(function(sense, i) {
+          html += '<div class="modal-sense"><p class="sense-num">' + (i+1) + '.</p><div class="sense-body"><p class="sense-def">' + linkifyDef(sense.definition) + '</p>';
+          if (sense.examples && sense.examples.length > 0) {
+            html += '<ul class="sense-examples">';
+            sense.examples.forEach(function(ex) { html += '<li>' + ex + '</li>'; });
+            html += '</ul>';
+          }
+          if (sense.synonyms && sense.synonyms.length > 0) {
+            html += '<p class="sense-synonyms"><strong>Synonyms:</strong> ' + sense.synonyms.join(', ') + '</p>';
+          }
+          html += '</div></div>';
+        });
+        html += '</div>';
+      }
+
+      if (entry.forms && entry.forms.length > 0) {
+        const mainForms = entry.forms.filter(function(f) {
+          return f.tags &&
+            f.tags.some(function(t) { return ['past','participle','present','infinitive','imperative','auxiliary'].includes(t); }) &&
+            !f.tags.includes('multiword-construction') &&
+            !f.tags.includes('table-tags') &&
+            !f.tags.includes('inflection-template') &&
+            !f.tags.includes('class') &&
+            !f.tags.includes('alternative');
+        }).slice(0, 12);
+
+        if (mainForms.length > 0) {
+          html += '<div class="modal-section"><h3 class="modal-section-title">Word Forms</h3><div class="forms-grid">';
+          mainForms.forEach(function(f) {
+            html += '<div class="form-item"><span class="form-word">' + f.word + '</span><span class="form-tags">' + f.tags.join(', ') + '</span></div>';
+          });
+          html += '</div></div>';
+        }
+      }
+
+      if (entry.antonyms && entry.antonyms.length > 0) {
+        html += '<div class="modal-section"><h3 class="modal-section-title">Antonyms</h3><p class="modal-antonyms">' + entry.antonyms.join(', ') + '</p></div>';
+      }
+
+      modalBody.innerHTML = html || '<p class="modal-loading">No details available.</p>';
+
+      modalBody.querySelectorAll('.base-word-link, .inline-word-link').forEach(function(btn) {
+        btn.addEventListener('click', function() { openModal(btn.dataset.word); });
+      });
+
+    } catch (e) {
+      modalBody.innerHTML = '<p class="modal-loading">Word not found in dictionary.</p>';
+    }
+  }
+
+  // ── Close Modal ──
+  modalClose.addEventListener('click', () => modalOverlay.classList.remove('open'));
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) modalOverlay.classList.remove('open');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') modalOverlay.classList.remove('open');
+  });
+
+</script>
+</body>
+</html>
