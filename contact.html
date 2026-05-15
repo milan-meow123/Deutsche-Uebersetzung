@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deutsche Übersetzung — Von Milan Magar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+  <link rel="stylesheet" type="text/css" href="headerfooter.css">
+  <link rel="stylesheet" type="text/css" href="contact.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="header-brand">
+    <div>
+      <h1 class="brand-title">Deutsche <span>Übersetzung</span></h1>
+      <h2 class="brand-subtitle">Von Milan Magar</h2>
+    </div>
+    <div class="brand-rule"></div>
+  </div>
+
+  <nav class="header-nav" aria-label="Hauptnavigation">
+    <a href="index.html">Homepage</a>
+    <a href="translation.html">Translation</a>
+    <a href="contact.html" class="active">Contact</a>
+    <a href="wordcollection.html">Word Collection</a>
+  </nav>
+
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menü öffnen">☰ Menü</button>
+  <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile Navigation">
+    <a href="index.html" class="active">Homepage</a>
+    <a href="translation.html">Translation</a>
+    <a href="contact.html">Contact</a>
+    <a href="wordcollection.html">Word Collection</a>
+  </nav>
+</header>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main>
+  <section class="contact-section">
+ 
+    <span class="contact-label">Get in touch</span>
+    <h2 class="contact-heading">Find Me Online</h2>
+    <p class="contact-sub">Choose a platform and say hello — I'd love to hear from you.</p>
+ 
+    <ul class="contact-list">
+ 
+      <!-- Instagram -->
+      <li>
+        <a href="https://www.instagram.com/milan_meow123/" target="_blank" rel="noopener noreferrer" class="contact-item">
+          <i class="fa-brands fa-instagram"></i>
+          <div class="contact-info">
+            <span class="contact-name">Instagram</span>
+            <span class="contact-handle">@milan_meow123</span>
+          </div>
+          <span class="contact-badge">Active</span>
+          <span class="contact-arrow">→</span>
+        </a>
+      </li>
+ 
+      <!-- Facebook -->
+      <li>
+        <a href="https://www.facebook.com/milan.magar.580027" target="_blank" rel="noopener noreferrer" class="contact-item">
+          <i class="fa-brands fa-facebook"></i>
+          <div class="contact-info">
+            <span class="contact-name">Facebook</span>
+            <span class="contact-handle">Milan Magar</span>
+          </div>
+          <span class="contact-badge">Active</span>
+          <span class="contact-arrow">→</span>
+        </a>
+      </li>
+ 
+      <!-- Email -->
+      <li>
+        <a href="mailto:milanmagar8848.86@gmail.com" class="contact-item">
+          <i class="fa-solid fa-envelope"></i>
+          <div class="contact-info">
+            <span class="contact-name">Email</span>
+            <span class="contact-handle">milanmagar8848.86@gmail.com</span>
+          </div>
+          <span class="contact-badge">Active</span>
+          <span class="contact-arrow">→</span>
+        </a>
+      </li>
+ 
+      <!-- GitHub (Coming Soon) -->
+      <li>
+        <a class="contact-item disabled" aria-disabled="true">
+          <i class="fa-brands fa-github"></i>
+          <div class="contact-info">
+            <span class="contact-name">GitHub</span>
+            <span class="contact-handle">Available soon</span>
+          </div>
+          <span class="contact-badge soon">Coming Soon</span>
+        </a>
+      </li>
+ 
+      <!-- LinkedIn (Coming Soon) -->
+      <li>
+        <a class="contact-item disabled" aria-disabled="true">
+          <i class="fa-brands fa-linkedin"></i>
+          <div class="contact-info">
+            <span class="contact-name">LinkedIn</span>
+            <span class="contact-handle">Available soon</span>
+          </div>
+          <span class="contact-badge soon">Coming Soon</span>
+        </a>
+      </li>
+ 
+    </ul>
+  </section>
+</main>
+
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <p class="footer-thanks">Danke für Ihren Besuch &nbsp;·&nbsp; धन्यवाद</p>
+
+  <div class="footer-flags">
+    <div class="flag-wrap">
+      <span class="fi fi-np"></span>
+      <span class="flag-label">Nepal</span>
+    </div>
+    <div class="flag-wrap">
+      <span class="fi fi-de"></span>
+      <span class="flag-label">Deutschland</span>
+    </div>
+  </div>
+
+  <div class="footer-divider"></div>
+
+  <p class="footer-copy">
+    &copy; <span id="year"></span> Deutsche Übersetzung — Von Milan Magar. Alle Rechte vorbehalten.<br>
+    Designed with ♥ between Nepal &amp; Germany.<br>
+    <a href="contact.html">Kontakt</a> &nbsp;·&nbsp; <a href="#">Datenschutz</a> &nbsp;·&nbsp; <a href="#">Impressum</a>
+  </p>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+</script>
+</body>
+</html>
