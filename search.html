@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search -- Deutsche Ubersetzung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+  <link rel="stylesheet" href="variables.css" />
+  <link rel="stylesheet" href="headerfooter.css" />
+  <link rel="stylesheet" href="search.css" />
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-brand">
+    <div>
+      <h1 class="brand-title">Deutsche <span>Ubersetzung</span></h1>
+      <h2 class="brand-subtitle">Von Milan Magar</h2>
+    </div>
+    <div class="brand-rule"></div>
+  </div>
+  <nav class="header-nav">
+    <a href="index.html">Homepage</a>
+    <a href="translation.html">Translation</a>
+    <a href="contact.html">Contact</a>
+    <a href="search.html" class="active">Word Collection</a>
+  </nav>
+  <button class="hamburger" onclick="toggleMenu()">Menu</button>
+  <nav class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Homepage</a>
+    <a href="translation.html">Translation</a>
+    <a href="contact.html">Contact</a>
+    <a href="search.html" class="active">Word Collection</a>
+  </nav>
+</header>
+
+<!-- MAIN -->
+<main class="search-main">
+
+  <!-- Search Section -->
+  <section class="search-hero" id="searchHero">
+    <span class="search-label">Wortsuche</span>
+    <h2 class="search-heading">Look up a German Word</h2>
+    <p class="search-sub">Enter a German word to see its meaning, forms, and examples.</p>
+
+    <div class="search-lang-badge">
+      <span class="fi fi-de"></span> German &rarr; <span class="fi fi-gb"></span>English
+    </div>
+
+    <div class="search-bar-wrap">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="Enter a German word..."
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button class="search-btn" id="searchBtn">Search</button>
+    </div>
+
+    <div class="recent-wrap" id="recentWrap">
+      <span class="recent-label">Recent searches</span>
+      <div class="recent-list" id="recentList"></div>
+      <button class="recent-clear" id="recentClear">Clear all</button>
+    </div>
+  </section>
+
+  <!-- Loading -->
+  <div class="search-loading" id="searchLoading" style="display:none;">
+    <div class="loading-spinner"></div>
+    <p>Looking up word...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="search-error" id="searchError" style="display:none;">
+    <p class="error-icon">&#128269;</p>
+    <p class="error-msg" id="errorMsg">Word not found.</p>
+    <button class="back-btn" onclick="goBack()">Try again</button>
+  </div>
+
+  <!-- Results Section -->
+  <section class="results-section" id="resultsSection" style="display:none;">
+    <div class="results-wrapper">
+
+      <div class="result-header">
+        <div>
+          <h2 class="result-word" id="resultWord"></h2>
+          <div class="result-meta" id="resultMeta"></div>
+        </div>
+        <button class="back-btn" onclick="goBack()">&#8592; New Search</button>
+      </div>
+
+      <div class="result-body" id="resultBody"></div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <p class="footer-thanks">Danke fur Ihren Besuch &nbsp;.&nbsp; Thank you</p>
+  <div class="footer-flags">
+    <div class="flag-wrap">
+      <span class="fi fi-np"></span>
+      <span class="flag-label">Nepal</span>
+    </div>
+    <div class="flag-wrap">
+      <span class="fi fi-de"></span>
+      <span class="flag-label">Deutschland</span>
+    </div>
+  </div>
+  <div class="footer-divider"></div>
+  <p class="footer-copy">
+    &copy; <span id="year"></span> Deutsche Ubersetzung -- Von Milan Magar. Alle Rechte vorbehalten.<br>
+    Designed with love between Nepal &amp; Germany.<br>
+    <a href="contact.html">Kontakt</a> &nbsp;.&nbsp; <a href="#">Datenschutz</a> &nbsp;.&nbsp; <a href="#">Impressum</a>
+  </p>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // ── Recent searches ──
+  const RECENT_KEY = 'deu_recent_searches';
+
+  function getRecent() {
+    try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; }
+    catch(e) { return []; }
+  }
+
+  function saveRecent(word) {
+    let list = getRecent();
+    list = list.filter(w => w.toLowerCase() !== word.toLowerCase());
+    list.unshift(word);
+    if (list.length > 10) list = list.slice(0, 10);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+    renderRecent();
+  }
+
+  function renderRecent() {
+    const list  = getRecent();
+    const wrap  = document.getElementById('recentWrap');
+    const el    = document.getElementById('recentList');
+    const clear = document.getElementById('recentClear');
+
+    if (list.length === 0) {
+      wrap.style.display = 'none';
+      return;
+    }
+
+    wrap.style.display = 'flex';
+    el.innerHTML = '';
+    list.forEach(word => {
+      const chip = document.createElement('button');
+      chip.classList.add('recent-chip');
+      chip.textContent = word;
+      chip.addEventListener('click', () => {
+        document.getElementById('searchInput').value = word;
+        doSearch(word);
+      });
+      el.appendChild(chip);
+    });
+
+    clear.style.display = 'block';
+  }
+
+  document.getElementById('recentClear').addEventListener('click', () => {
+    localStorage.removeItem(RECENT_KEY);
+    renderRecent();
+  });
+
+  renderRecent();
+
+  // ── UI state ──
+  function showSection(section) {
+    document.getElementById('searchHero').style.display     = section === 'hero'    ? '' : 'none';
+    document.getElementById('resultsSection').style.display  = section === 'results' ? '' : 'none';
+    document.getElementById('searchLoading').style.display   = section === 'loading' ? '' : 'none';
+    document.getElementById('searchError').style.display     = section === 'error'   ? '' : 'none';
+  }
+
+  function goBack() {
+    showSection('hero');
+    document.getElementById('searchInput').value = '';
+  }
+
+  // ── Inflection prefixes ──
+  const inflectionPrefixes = [
+    'inflection of', 'genitive of', 'dative of', 'accusative of',
+    'nominative of', 'plural of', 'singular of', 'past tense of',
+    'past participle of', 'present participle of', 'comparative of',
+    'superlative of', 'alternative form of', 'diminutive of', 'feminine of'
+  ];
+
+  function extractBaseWord(def) {
+    const lower = def.toLowerCase();
+    for (const p of inflectionPrefixes) {
+      if (lower.startsWith(p)) {
+        return def.slice(p.length).trim().replace(/[:.;,].*$/, '').trim();
+      }
+    }
+    return null;
+  }
+
+  async function fetchWord(word) {
+    const url = 'https://freedictionaryapi.com/api/v1/entries/de/' + encodeURIComponent(word.toLowerCase());
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Not found');
+    return await res.json();
+  }
+
+  async function fetchSmart(word) {
+    const data  = await fetchWord(word);
+    const entry = data.entries[0];
+    const first = entry.senses && entry.senses[0] ? entry.senses[0].definition : '';
+    const base  = extractBaseWord(first);
+    if (base) {
+      try {
+        const baseData = await fetchWord(base);
+        baseData._originalWord = word;
+        baseData._baseWord = base;
+        return baseData;
+      } catch(e) { return data; }
+    }
+    return data;
+  }
+
+  // ── Search ──
+  async function doSearch(word) {
+    if (!word.trim()) return;
+    showSection('loading');
+    window.scrollTo(0, 0);
+
+    try {
+      const data = await fetchSmart(word.trim());
+      saveRecent(word.trim());
+      renderResults(word.trim(), data);
+      showSection('results');
+    } catch(e) {
+      document.getElementById('errorMsg').textContent = 'Word "' + word + '" not found. Try another word.';
+      showSection('error');
+    }
+  }
+
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    doSearch(document.getElementById('searchInput').value);
+  });
+
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch(document.getElementById('searchInput').value);
+  });
+
+  // ── Render results ──
+  function renderResults(originalWord, data) {
+    const entry = data.entries[0];
+
+    document.getElementById('resultWord').textContent = data._baseWord || originalWord;
+
+    let meta = '';
+    if (entry.partOfSpeech) meta += '<span class="meta-pos">' + entry.partOfSpeech + '</span>';
+    if (entry.pronunciations && entry.pronunciations.length > 0) {
+      const ipa = entry.pronunciations.find(p => p.type === 'ipa');
+      if (ipa) meta += '<span class="meta-ipa">' + ipa.text + '</span>';
+    }
+    if (data._baseWord) {
+      meta += '<span class="meta-base">form of: <strong>' + data._baseWord + '</strong></span>';
+    }
+    document.getElementById('resultMeta').innerHTML = meta;
+
+    let html = '';
+
+    // 1. Meanings
+    if (entry.senses && entry.senses.length > 0) {
+      html += '<div class="result-section">';
+      html += '<h3 class="result-section-title"><span class="section-num">1</span> Meanings</h3>';
+      entry.senses.forEach(function(sense, i) {
+        html += '<div class="sense-block">';
+        html += '<div class="sense-top"><span class="sense-index">' + (i + 1) + '.</span>';
+        if (sense.tags && sense.tags.length > 0) {
+          const filtered = sense.tags.filter(t => !['class', 'table-tags', 'inflection-template'].includes(t));
+          if (filtered.length > 0) {
+            html += '<span class="sense-tags">' + filtered.map(t => '<span class="sense-tag">' + t + '</span>').join('') + '</span>';
+          }
+        }
+        html += '</div>';
+        html += '<p class="sense-definition">' + sense.definition + '</p>';
+        if (sense.examples && sense.examples.length > 0) {
+          html += '<ul class="sense-examples">';
+          sense.examples.forEach(ex => { html += '<li>' + ex + '</li>'; });
+          html += '</ul>';
+        }
+        if (sense.synonyms && sense.synonyms.length > 0) {
+          html += '<p class="sense-related"><strong>Synonyms:</strong> ' + sense.synonyms.join(', ') + '</p>';
+        }
+        if (sense.antonyms && sense.antonyms.length > 0) {
+          html += '<p class="sense-related"><strong>Antonyms:</strong> ';
+          html += sense.antonyms.map(a => '<button class="antonym-link" onclick="doSearch(\'' + a + '\')">' + a + '</button>').join(', ');
+          html += '</p>';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    // 2. Word Forms
+    if (entry.forms && entry.forms.length > 0) {
+      const skipTags = ['table-tags', 'inflection-template', 'class', 'alternative', 'multiword-construction'];
+      const forms = entry.forms.filter(f => f.tags && !f.tags.some(t => skipTags.includes(t)));
+
+      if (forms.length > 0) {
+        html += '<div class="result-section">';
+        html += '<h3 class="result-section-title"><span class="section-num">2</span> Word Forms & Conjugation</h3>';
+        html += '<div class="forms-grid">';
+        forms.slice(0, 18).forEach(function(f) {
+          html += '<div class="form-cell">';
+          html += '<span class="form-word">' + f.word + '</span>';
+          const details = f.tags.filter(t => !['multiword-construction'].includes(t));
+          if (details.length > 0) html += '<span class="form-detail">' + details.join(', ') + '</span>';
+          html += '</div>';
+        });
+        html += '</div></div>';
+      }
+    }
+
+    // 3. Antonyms (word level)
+    if (entry.antonyms && entry.antonyms.length > 0) {
+      html += '<div class="result-section">';
+      html += '<h3 class="result-section-title"><span class="section-num">3</span> Antonyms</h3>';
+      html += '<div class="antonyms-list">';
+      entry.antonyms.forEach(a => {
+        html += '<button class="antonym-chip antonym-link" onclick="doSearch(\'' + a + '\')">' + a + '</button>';
+      });
+      html += '</div></div>';
+    }
+
+    // Source
+    if (data.source && data.source.url) {
+      html += '<div class="result-source">Source: <a href="' + data.source.url + '" target="_blank" rel="noopener">' + data.source.url + '</a></div>';
+    }
+
+    document.getElementById('resultBody').innerHTML = html;
+  }
+</script>
+</body>
+</html>

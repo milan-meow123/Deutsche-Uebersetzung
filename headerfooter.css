@@ -229,3 +229,19 @@
       .card { padding: 1.5rem 1.2rem 2rem; }
       .explore-header { margin-bottom: 1.8rem; }
     }
+    @media (max-width: 600px) {
+  html, body { width: 100%; overflow-x: hidden; }
+
+  /* Header */
+  .header-brand { padding: 1.2rem 1rem 1rem; width: 100%; }
+  .brand-title { font-size: 1.6rem; letter-spacing: 0.06em; }
+  .brand-subtitle { font-size: 0.8rem; }
+  .header-nav { display: none; }
+  .hamburger { display: block; width: 100%; text-align: center; margin: 0.6rem auto; }
+
+  /* Footer */
+  footer { padding: 1.8rem 1.2rem 1.2rem; width: 100%; }
+  .footer-thanks { font-size: 1rem; }
+  .fi { font-size: 2rem; }
+  .footer-copy { font-size: 0.75rem; }
+}

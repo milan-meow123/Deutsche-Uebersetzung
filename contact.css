@@ -126,6 +126,34 @@
   transform: translateX(3px);
 }
 
-@media (max-width: 480px) {
-  .contact-list { max-width: 100%; }
+@media (max-width: 600px) {
+  .contact-section {
+    padding: 2.5rem 1rem;
+  }
+
+  .contact-item {
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+    gap: 0.8rem;
+  }
+
+  .contact-info {
+    min-width: 0;
+    word-break: break-all;
+  }
+
+  .contact-handle {
+    font-size: 0.78rem;
+    word-break: break-all;
+  }
+
+  .contact-badge {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+  }
+
+  .contact-arrow {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+  }
 }

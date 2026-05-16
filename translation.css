@@ -541,14 +541,74 @@
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .translation-columns { flex-direction: column; }
-  .box-input, .box-output { flex: none; width: 100%; }
-  .text-area { min-height: 260px; max-height: 260px; }
-  .highlighted-list { min-height: 200px; max-height: 200px; }
+  .translation-columns {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .box-input,
+  .box-output {
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .text-area {
+    min-height: 260px;
+    max-height: 260px;
+  }
+
+  .highlighted-list {
+    min-height: 200px;
+    max-height: 200px;
+  }
+
   .forms-grid { grid-template-columns: 1fr 1fr; }
 }
 
-@media (max-width: 640px) {
-  .translation-main { padding: 2rem 1rem 3rem; }
-  .modal { max-height: 90vh; }
+@media (max-width: 600px) {
+  .translation-main {
+    padding: 1.2rem 1rem 2rem;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .translation-wrapper {
+    width: 100%;
+  }
+
+  .translation-columns {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .box-input,
+  .box-output {
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .modal {
+    max-height: 90vh;
+    margin: 0;
+  }
+
+  .modal-overlay {
+    padding: 0.8rem;
+  }
+
+  .forms-grid { grid-template-columns: 1fr; }
+
+  .save-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .btn-download,
+  .btn-save {
+    width: 100%;
+    text-align: center;
+  }
 }

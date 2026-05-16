@@ -196,3 +196,14 @@
       line-height: 1.65;
       font-weight: 300;
     }
+    @media (max-width: 600px) {
+  main { width: 100%; overflow-x: hidden; }
+  .hero { padding: 2.5rem 1.2rem 2rem; width: 100%; }
+  .hero-heading { font-size: 1.4rem; }
+  .hero-sub { font-size: 0.95rem; }
+  .about-strip { padding: 2.5rem 1.2rem; width: 100%; }
+  .about-strip blockquote { font-size: 1rem; }
+  .cards { grid-template-columns: 1fr; }
+  .explore { padding: 2rem 1rem; width: 100%; }
+  .card { padding: 1.5rem 1.2rem 2rem; }
+}
