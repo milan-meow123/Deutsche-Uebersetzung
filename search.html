@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Search -- Deutsche Ubersetzung</title>
+  <title>milan.de — Wortsuche</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23213448'/><text x='50' y='72' font-size='55' font-family='serif' font-weight='bold' fill='%2394B4C1' text-anchor='middle'>DE</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
-  <link rel="stylesheet" href="variables.css" />
+  <link rel="stylesheet" href="home.css" />
   <link rel="stylesheet" href="headerfooter.css" />
   <link rel="stylesheet" href="search.css" />
 </head>
@@ -22,11 +23,18 @@
     <div class="brand-rule"></div>
   </div>
   <nav class="header-nav">
-    <a href="index.html">Homepage</a>
-    <a href="translation.html">Translation</a>
-    <a href="contact.html">Contact</a>
-    <a href="search.html" class="active">Word Collection</a>
-  </nav>
+  <a href="index.html">Homepage</a>
+  <a href="translation.html">Translation</a>
+  <a href="contact.html">Contact</a>
+  <a href="search.html" class="active">Search</a>
+  <button class="umlaut-btn" onmousedown="event.preventDefault(); insertChar('ä')">ä</button>
+<button class="umlaut-btn" onmousedown="event.preventDefault(); insertChar('ö')">ö</button>
+<button class="umlaut-btn" onmousedown="event.preventDefault(); insertChar('ü')">ü</button>
+<button class="umlaut-btn" onmousedown="event.preventDefault(); insertChar('Ä')">Ä</button>
+<button class="umlaut-btn" onmousedown="event.preventDefault(); insertChar('Ö')">Ö</button>
+<button class="umlaut-btn" onmousedown="event.preventDefault(); insertChar('Ü')">Ü</button>
+<button class="umlaut-btn" onmousedown="event.preventDefault(); insertChar('ß')">ß</button>
+</nav>
   <button class="hamburger" onclick="toggleMenu()">Menu</button>
   <nav class="mobile-menu" id="mobileMenu">
     <a href="index.html">Homepage</a>
@@ -39,34 +47,54 @@
 <!-- MAIN -->
 <main class="search-main">
 
-  <!-- Search Section -->
+  <!-- Hero — shown before search -->
   <section class="search-hero" id="searchHero">
     <span class="search-label">Wortsuche</span>
     <h2 class="search-heading">Look up a German Word</h2>
     <p class="search-sub">Enter a German word to see its meaning, forms, and examples.</p>
 
     <div class="search-lang-badge">
-      <span class="fi fi-de"></span> German &rarr; <span class="fi fi-gb"></span>English
+      <span class="fi fi-de"></span> German &rarr; <span class="fi fi-gb"></span> English
     </div>
 
     <div class="search-bar-wrap">
       <input
         type="text"
-        id="searchInput"
-        class="search-input"
+        id="searchInputHero"
+        class="search-input search-input-hero"
         placeholder="Enter a German word..."
         autocomplete="off"
         spellcheck="false"
       />
-      <button class="search-btn" id="searchBtn">Search</button>
+      <button class="search-btn search-btn-hero" id="searchBtnHero">Search</button>
     </div>
 
+    <!-- Recent searches — chips -->
     <div class="recent-wrap" id="recentWrap">
       <span class="recent-label">Recent searches</span>
       <div class="recent-list" id="recentList"></div>
       <button class="recent-clear" id="recentClear">Clear all</button>
     </div>
   </section>
+
+  <!-- Sticky search bar — shown only in results -->
+  <div class="sticky-search-bar" id="stickySearchBar" style="display:none;">
+    <div class="sticky-search-inner">
+      <span class="sticky-logo">&#128218; DE</span>
+      <div class="sticky-input-wrap">
+        <input
+          type="text"
+          id="searchInputSticky"
+          class="search-input search-input-sticky"
+          placeholder="Enter a German word..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div class="sticky-dropdown" id="stickyDropdown"></div>
+      </div>
+      <button class="search-btn search-btn-sticky" id="searchBtnSticky">Search</button>
+    </div>
+  </div>
 
   <!-- Loading -->
   <div class="search-loading" id="searchLoading" style="display:none;">
@@ -78,23 +106,19 @@
   <div class="search-error" id="searchError" style="display:none;">
     <p class="error-icon">&#128269;</p>
     <p class="error-msg" id="errorMsg">Word not found.</p>
-    <button class="back-btn" onclick="goBack()">Try again</button>
+    <button class="back-btn" onclick="goBack()">&#8592; Try again</button>
   </div>
 
-  <!-- Results Section -->
+  <!-- Results -->
   <section class="results-section" id="resultsSection" style="display:none;">
     <div class="results-wrapper">
-
       <div class="result-header">
         <div>
           <h2 class="result-word" id="resultWord"></h2>
           <div class="result-meta" id="resultMeta"></div>
         </div>
-        <button class="back-btn" onclick="goBack()">&#8592; New Search</button>
       </div>
-
       <div class="result-body" id="resultBody"></div>
-
     </div>
   </section>
 
@@ -123,12 +147,9 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+  function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('open'); }
 
-  function toggleMenu() {
-    document.getElementById('mobileMenu').classList.toggle('open');
-  }
-
-  // ── Recent searches ──
+  // ── Recent searches (max 5, vertical list) ──
   const RECENT_KEY = 'deu_recent_searches';
 
   function getRecent() {
@@ -140,7 +161,7 @@
     let list = getRecent();
     list = list.filter(w => w.toLowerCase() !== word.toLowerCase());
     list.unshift(word);
-    if (list.length > 10) list = list.slice(0, 10);
+    if (list.length > 5) list = list.slice(0, 5);
     localStorage.setItem(RECENT_KEY, JSON.stringify(list));
     renderRecent();
   }
@@ -151,10 +172,7 @@
     const el    = document.getElementById('recentList');
     const clear = document.getElementById('recentClear');
 
-    if (list.length === 0) {
-      wrap.style.display = 'none';
-      return;
-    }
+    if (list.length === 0) { wrap.style.display = 'none'; return; }
 
     wrap.style.display = 'flex';
     el.innerHTML = '';
@@ -163,13 +181,32 @@
       chip.classList.add('recent-chip');
       chip.textContent = word;
       chip.addEventListener('click', () => {
-        document.getElementById('searchInput').value = word;
+        document.getElementById('searchInputHero').value = word;
         doSearch(word);
       });
       el.appendChild(chip);
     });
-
     clear.style.display = 'block';
+  }
+
+  // Sticky dropdown recent list
+  function renderStickyDropdown() {
+    const list = getRecent();
+    const dropdown = document.getElementById('stickyDropdown');
+    if (!dropdown) return;
+    if (list.length === 0) { dropdown.style.display = 'none'; return; }
+    dropdown.innerHTML = '';
+    list.forEach(word => {
+      const item = document.createElement('button');
+      item.classList.add('dropdown-item');
+      item.textContent = word;
+      item.addEventListener('click', () => {
+        document.getElementById('searchInputSticky').value = word;
+        dropdown.style.display = 'none';
+        doSearch(word);
+      });
+      dropdown.appendChild(item);
+    });
   }
 
   document.getElementById('recentClear').addEventListener('click', () => {
@@ -181,15 +218,16 @@
 
   // ── UI state ──
   function showSection(section) {
-    document.getElementById('searchHero').style.display     = section === 'hero'    ? '' : 'none';
-    document.getElementById('resultsSection').style.display  = section === 'results' ? '' : 'none';
-    document.getElementById('searchLoading').style.display   = section === 'loading' ? '' : 'none';
-    document.getElementById('searchError').style.display     = section === 'error'   ? '' : 'none';
+    document.getElementById('searchHero').style.display      = section === 'hero'    ? '' : 'none';
+    document.getElementById('stickySearchBar').style.display  = section === 'results' ? '' : 'none';
+    document.getElementById('resultsSection').style.display   = section === 'results' ? '' : 'none';
+    document.getElementById('searchLoading').style.display    = section === 'loading' ? '' : 'none';
+    document.getElementById('searchError').style.display      = section === 'error'   ? '' : 'none';
   }
 
   function goBack() {
     showSection('hero');
-    document.getElementById('searchInput').value = '';
+    document.getElementById('searchInputHero').value = '';
   }
 
   // ── Inflection prefixes ──
@@ -203,18 +241,21 @@
   function extractBaseWord(def) {
     const lower = def.toLowerCase();
     for (const p of inflectionPrefixes) {
-      if (lower.startsWith(p)) {
-        return def.slice(p.length).trim().replace(/[:.;,].*$/, '').trim();
-      }
+      if (lower.startsWith(p)) return def.slice(p.length).trim().replace(/[:.;,].*$/, '').trim();
     }
     return null;
   }
 
   async function fetchWord(word) {
-    const url = 'https://freedictionaryapi.com/api/v1/entries/de/' + encodeURIComponent(word.toLowerCase());
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Not found');
-    return await res.json();
+    const w = word.trim();
+    const attempts = [w, w.charAt(0).toUpperCase() + w.slice(1), w.toLowerCase()];
+    for (const attempt of attempts) {
+      try {
+        const res = await fetch('https://freedictionaryapi.com/api/v1/entries/de/' + encodeURIComponent(attempt));
+        if (res.ok) return await res.json();
+      } catch(e) { continue; }
+    }
+    throw new Error('Not found');
   }
 
   async function fetchSmart(word) {
@@ -233,6 +274,10 @@
     return data;
   }
 
+  function wordBtn(word, cls) {
+    return '<button class="' + cls + '" onclick="doSearch(\'' + word.replace(/'/g, "\\'") + '\')">' + word + '</button>';
+  }
+
   // ── Search ──
   async function doSearch(word) {
     if (!word.trim()) return;
@@ -242,6 +287,7 @@
     try {
       const data = await fetchSmart(word.trim());
       saveRecent(word.trim());
+      document.getElementById('searchInputSticky').value = word.trim();
       renderResults(word.trim(), data);
       showSection('results');
     } catch(e) {
@@ -250,18 +296,39 @@
     }
   }
 
-  document.getElementById('searchBtn').addEventListener('click', () => {
-    doSearch(document.getElementById('searchInput').value);
+  // Hero search
+  document.getElementById('searchBtnHero').addEventListener('click', () => {
+    doSearch(document.getElementById('searchInputHero').value);
+  });
+  document.getElementById('searchInputHero').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch(document.getElementById('searchInputHero').value);
   });
 
-  document.getElementById('searchInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doSearch(document.getElementById('searchInput').value);
+  // Sticky search
+  // Sticky dropdown show/hide
+  document.getElementById('searchInputSticky').addEventListener('focus', () => {
+    renderStickyDropdown();
+    const d = document.getElementById('stickyDropdown');
+    const list = getRecent();
+    if (list.length > 0) d.style.display = 'block';
+  });
+  document.getElementById('searchInputSticky').addEventListener('blur', () => {
+    setTimeout(() => { document.getElementById('stickyDropdown').style.display = 'none'; }, 200);
+  });
+  document.getElementById('searchInputSticky').addEventListener('input', () => {
+    document.getElementById('stickyDropdown').style.display = 'none';
+  });
+
+  document.getElementById('searchBtnSticky').addEventListener('click', () => {
+    doSearch(document.getElementById('searchInputSticky').value);
+  });
+  document.getElementById('searchInputSticky').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch(document.getElementById('searchInputSticky').value);
   });
 
   // ── Render results ──
   function renderResults(originalWord, data) {
     const entry = data.entries[0];
-
     document.getElementById('resultWord').textContent = data._baseWord || originalWord;
 
     let meta = '';
@@ -271,7 +338,7 @@
       if (ipa) meta += '<span class="meta-ipa">' + ipa.text + '</span>';
     }
     if (data._baseWord) {
-      meta += '<span class="meta-base">form of: <strong>' + data._baseWord + '</strong></span>';
+      meta += '<span class="meta-base">form of: ' + wordBtn(data._baseWord, 'inline-word-btn') + '</span>';
     }
     document.getElementById('resultMeta').innerHTML = meta;
 
@@ -286,9 +353,7 @@
         html += '<div class="sense-top"><span class="sense-index">' + (i + 1) + '.</span>';
         if (sense.tags && sense.tags.length > 0) {
           const filtered = sense.tags.filter(t => !['class', 'table-tags', 'inflection-template'].includes(t));
-          if (filtered.length > 0) {
-            html += '<span class="sense-tags">' + filtered.map(t => '<span class="sense-tag">' + t + '</span>').join('') + '</span>';
-          }
+          if (filtered.length > 0) html += '<span class="sense-tags">' + filtered.map(t => '<span class="sense-tag">' + t + '</span>').join('') + '</span>';
         }
         html += '</div>';
         html += '<p class="sense-definition">' + sense.definition + '</p>';
@@ -298,11 +363,13 @@
           html += '</ul>';
         }
         if (sense.synonyms && sense.synonyms.length > 0) {
-          html += '<p class="sense-related"><strong>Synonyms:</strong> ' + sense.synonyms.join(', ') + '</p>';
+          html += '<p class="sense-related"><strong>Synonyms:</strong> ';
+          html += sense.synonyms.map(s => wordBtn(s, 'word-link synonym-link')).join(' ');
+          html += '</p>';
         }
         if (sense.antonyms && sense.antonyms.length > 0) {
           html += '<p class="sense-related"><strong>Antonyms:</strong> ';
-          html += sense.antonyms.map(a => '<button class="antonym-link" onclick="doSearch(\'' + a + '\')">' + a + '</button>').join(', ');
+          html += sense.antonyms.map(a => wordBtn(a, 'word-link antonym-link')).join(' ');
           html += '</p>';
         }
         html += '</div>';
@@ -314,15 +381,14 @@
     if (entry.forms && entry.forms.length > 0) {
       const skipTags = ['table-tags', 'inflection-template', 'class', 'alternative', 'multiword-construction'];
       const forms = entry.forms.filter(f => f.tags && !f.tags.some(t => skipTags.includes(t)));
-
       if (forms.length > 0) {
         html += '<div class="result-section">';
         html += '<h3 class="result-section-title"><span class="section-num">2</span> Word Forms & Conjugation</h3>';
         html += '<div class="forms-grid">';
         forms.slice(0, 18).forEach(function(f) {
-          html += '<div class="form-cell">';
+          html += '<div class="form-cell" onclick="doSearch(\'' + f.word.replace(/'/g, "\\'") + '\')" title="Search: ' + f.word + '">';
           html += '<span class="form-word">' + f.word + '</span>';
-          const details = f.tags.filter(t => !['multiword-construction'].includes(t));
+          const details = f.tags.filter(t => t !== 'multiword-construction');
           if (details.length > 0) html += '<span class="form-detail">' + details.join(', ') + '</span>';
           html += '</div>';
         });
@@ -330,14 +396,12 @@
       }
     }
 
-    // 3. Antonyms (word level)
+    // 3. Antonyms
     if (entry.antonyms && entry.antonyms.length > 0) {
       html += '<div class="result-section">';
       html += '<h3 class="result-section-title"><span class="section-num">3</span> Antonyms</h3>';
       html += '<div class="antonyms-list">';
-      entry.antonyms.forEach(a => {
-        html += '<button class="antonym-chip antonym-link" onclick="doSearch(\'' + a + '\')">' + a + '</button>';
-      });
+      entry.antonyms.forEach(a => { html += wordBtn(a, 'antonym-chip antonym-link'); });
       html += '</div></div>';
     }
 
@@ -348,6 +412,17 @@
 
     document.getElementById('resultBody').innerHTML = html;
   }
+
+  function insertChar(char) {
+  const active = document.activeElement;
+  if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+    const start = active.selectionStart;
+    const end = active.selectionEnd;
+    active.value = active.value.slice(0, start) + char + active.value.slice(end);
+    active.selectionStart = active.selectionEnd = start + 1;
+    active.focus();
+  }
+}
 </script>
 </body>
 </html>
